@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("all-orders");
-  const [Orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState([]);
 
-  useEffect(() => {});
   const sidebarItems = [
     { id: "all-orders", label: "All Orders", icon: "📦" },
     { id: "all-sellers", label: "All Sellers", icon: "🏪" },
@@ -17,7 +16,7 @@ const AdminDashboard = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "all-orders":
-        return <AllOrders />;
+        return <AllOrders orders={orders} />;
       case "all-sellers":
         return <AllSellers />;
       case "all-users":
@@ -72,7 +71,7 @@ const AdminDashboard = () => {
 };
 
 // All Orders Component
-const AllOrders = (orders) => {
+const AllOrders = ({ orders }) => {
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">All Orders</h2>
