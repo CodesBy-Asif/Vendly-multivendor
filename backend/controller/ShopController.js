@@ -216,7 +216,7 @@ router.get("/products/:id", catchAsyncError(async (req, res, next) => {
 
 
 router.post("/logout", (req, res) => {
-    res.clearCookie("token", {
+    res.clearCookie("shop_token", {
         secure: true,
         httpOnly: false,       // Prevent JS access // or true if using HTTPS
         sameSite: "none",
