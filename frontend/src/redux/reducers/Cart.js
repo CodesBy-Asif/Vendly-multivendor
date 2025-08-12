@@ -38,7 +38,6 @@ export const cartReducer = createReducer(initialState, (builder) => {
                     quantity: Math.min(action.payload.quantity, action.payload.stock),
                 };
                 state.cart = [...(state.cart || []), safeProduct];
-
             }
             toast.success("item added to cart");
             saveCartToStorage(state.cart);
