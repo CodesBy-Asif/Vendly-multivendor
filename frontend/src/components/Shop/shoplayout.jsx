@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar.jsx";
-import Header from "./layout/Header.jsx";
+import Header from "./Layout/Header.jsx";
 import { Outlet } from "react-router-dom";
 
 export default function ShopLayout() {
