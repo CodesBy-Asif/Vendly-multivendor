@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("all-orders");
+  const [Orders, setOrders] = useState([]);
 
+  useEffect(() => {});
   const sidebarItems = [
     { id: "all-orders", label: "All Orders", icon: "📦" },
     { id: "all-sellers", label: "All Sellers", icon: "🏪" },

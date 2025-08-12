@@ -1,11 +1,8 @@
 // actions/user.js
 import axios from "axios";
-import Cookies from "js-cookie";
 import { server } from "../../Data.js";
 
 export const loadUser = () => async (dispatch) => {
-    const token = Cookies.get("token");
-    if (!token) return;
 
     try {
         dispatch({ type: "LoadUserRequest" });

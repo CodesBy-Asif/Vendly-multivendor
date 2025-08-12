@@ -139,28 +139,25 @@ function Header({ sticky }) {
                 <BiSearch className={"text-xl"} />
               </button>
             )}
-            {seller ? (
-              <a
-                href="/shop/dashboard"
-                className={
-                  "bg-primary hidden sm:block rounded-xl text-nowrap text-primary-foreground px-4 py-2 "
-                }
-                onClick={() => {}}
-              >
-                Go to Shop
-                <IoIosArrowForward className={"inline-block w-4 h-4"} />
-              </a>
-            ) : (
-              <a
-                className={
-                  "bg-primary hidden sm:block rounded-xl text-nowrap text-primary-foreground px-4 py-2 "
-                }
-                href="/shop/create"
-              >
-                Become Seller{" "}
-                <IoIosArrowForward className={"inline-block w-4 h-4"} />
-              </a>
-            )}
+            {!isMobile &&
+              (seller ? (
+                <a
+                  href="/shop/dashboard"
+                  className="bg-primary rounded-xl text-nowrap text-primary-foreground px-4 py-2"
+                >
+                  Go to Shop
+                  <IoIosArrowForward className="inline-block w-4 h-4" />
+                </a>
+              ) : (
+                <a
+                  href="/shop/create"
+                  className="bg-primary rounded-xl text-nowrap text-primary-foreground px-4 py-2"
+                >
+                  Become Seller
+                  <IoIosArrowForward className="inline-block w-4 h-4" />
+                </a>
+              ))}
+
             {isMobile && (
               <button
                 className="text-foreground sm:px-4 sm:py-2 px-2 py-1 rounded-lg text-sm"

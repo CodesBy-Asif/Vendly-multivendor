@@ -1,11 +1,8 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 import { server } from "../../Data";
-import Cookies from 'js-cookie'
 
 export const LoadSeller = () => async (dispatch) => {
-    const token = Cookies.get("shop_token");
-    if (!token) return;
 
     try {
         dispatch({ type: "LoadSellerRequest" });
@@ -15,11 +12,9 @@ export const LoadSeller = () => async (dispatch) => {
         });
 
         dispatch({ type: "LoadSellerSuccess", payload: data.shop });
-        toast.success("Shop loaded successfully!");
     } catch (error) {
         const errorMessage = error.response?.data?.message || "Failed to load shop";
         dispatch({ type: "LoadSellerFail", payload: errorMessage });
-        toast.error(errorMessage);
     }
 };
 export const createShop = (formData) => async (dispatch) => {

@@ -1,18 +1,24 @@
-// utils/logout.js
-import Cookies from 'js-cookie';
+import { server } from '../Data';
+import axios from 'axios';
 
-export const logout = () => {
-    // Remove tokens from cookies
-    Cookies.remove('access_token');
-    Cookies.remove('refresh_token');
-    Cookies.remove('token', { path: '/' })
+export const logout = async () => {
+    try {
+        // Call backend to clear HTTP-only cookies
+        await axios.post(`${server}/user/logout`, { withCredentials: true });
 
-    // Optionally clear other storage
-    localStorage.removeItem('user');
-    sessionStorage.clear();
 
+    } catch (error) {
+        console.error("Logout failed:", error);
+    }
 };
-export const logoutShop = () => {
-    Cookies.remove('shop_token', { path: '/' })
 
-};
+export const logoutShop = async () => {
+    try {
+        // Call backend to clear HTTP-only cookies
+        await axios.post(`${server}/shops/logout`, { withCredentials: true });
+
+
+    } catch (error) {
+        console.error("Logout failed:", error);
+    }
+}
