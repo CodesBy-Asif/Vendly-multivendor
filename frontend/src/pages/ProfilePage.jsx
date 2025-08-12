@@ -1,5 +1,5 @@
-import DashboardLayout from "../components/userDashboard/DashboardLayout.jsx";
+import Dashboardlayout from "../components/userDashboard/Dashboardlayout";
 
 export default function ProfilePage() {
-  return <DashboardLayout />;
+  return <Dashboardlayout />;
 }
