@@ -313,9 +313,9 @@ router.delete(
 
 router.post("/logout", (req, res) => {
     res.clearCookie("token", {
-        secure: true,       // Same as when you set it
-        httpOnly: true,
-        sameSite: "none"
+        secure: true,
+        httpOnly: false,       // Prevent JS access // or true if using HTTPS
+        sameSite: "none",
     });
     res.json({ success: true, message: "Logged out successfully" });
 });
