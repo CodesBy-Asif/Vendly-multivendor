@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import AuthForm from "../components/auth/AuthForm.jsx";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 const Login = (prop) => {
