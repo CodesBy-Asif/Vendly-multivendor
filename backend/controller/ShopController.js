@@ -116,8 +116,9 @@ router.post('/login', catchAsyncError(async (req, res, next) => {
         expiresIn: "7d",
     });
     const cookieOptions = {
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+        secure: true,
+        httpOnly: false,       // Prevent JS access // or true if using HTTPS
+        sameSite: "none",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
     res.cookie("shop_token", token, cookieOptions);
@@ -214,6 +215,13 @@ router.get("/products/:id", catchAsyncError(async (req, res, next) => {
 );
 
 
-
+router.post("/logout", (req, res) => {
+    res.clearCookie("token", {
+        secure: true,
+        httpOnly: false,       // Prevent JS access // or true if using HTTPS
+        sameSite: "none",
+    });
+    res.json({ success: true, message: "Logged out successfully" });
+});
 
 module.exports = router;
