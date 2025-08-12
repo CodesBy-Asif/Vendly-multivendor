@@ -25,7 +25,8 @@ export const favoritesReducer = createReducer(initialState, (builder) => {
         .addCase("AddFavorite", (state, action) => {
             const exists = state.favorites.find(f => f._id === action.payload._id);
             if (!exists) {
-                state.favorites.push(action.payload);
+                state.favorites = [...(state.favorites || []), action.payload];
+
                 saveFavoritesToStorage(state.favorites);
             }
         })
