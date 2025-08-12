@@ -311,6 +311,14 @@ router.delete(
     })
 );
 
+app.post("/logout", (req, res) => {
+    res.clearCookie("token", {
+        secure: true,       // Same as when you set it
+        httpOnly: true,
+        sameSite: "none"
+    });
+    res.json({ success: true, message: "Logged out successfully" });
+});
 
 
 module.exports = router;
