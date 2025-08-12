@@ -10,7 +10,13 @@ const { isSellerAuthenticated } = require("../middleware/isSellerAuthenticated")
 const Product = require('../models/Product');
 
 const router = express.Router();
-
+const cookieOptions = {
+    secure: true,
+    path: "/",
+    httpOnly: true,       // Prevent JS access // or true if using HTTPS
+    sameSite: "none",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+};
 const defaultLogo = "https://res.cloudinary.com/dxze1vehc/image/upload/v1752658448/60111_dfcrvf.jpg";
 router.post('/register', upload.single("logo"), catchAsyncError(async (req, res, next) => {
     const {
@@ -115,12 +121,7 @@ router.post('/login', catchAsyncError(async (req, res, next) => {
     const token = jwt.sign({ _id: shop._id }, process.env.JWT_SECRET, {
         expiresIn: "7d",
     });
-    const cookieOptions = {
-        secure: true,
-        httpOnly: false,       // Prevent JS access // or true if using HTTPS
-        sameSite: "none",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    };
+
     res.cookie("shop_token", token, cookieOptions);
     res.status(200).json({
         message: "Login successful",
@@ -216,11 +217,7 @@ router.get("/products/:id", catchAsyncError(async (req, res, next) => {
 
 
 router.post("/logout", (req, res) => {
-    res.clearCookie("shop_token", {
-        secure: true,
-        httpOnly: false,       // Prevent JS access // or true if using HTTPS
-        sameSite: "none",
-    });
+    res.clearCookie("shop_token", cookieOptions);
     res.json({ success: true, message: "Logged out successfully" });
 });
 
