@@ -311,7 +311,7 @@ router.delete(
     })
 );
 
-app.post("/logout", (req, res) => {
+router.post("/logout", (req, res) => {
     res.clearCookie("token", {
         secure: true,       // Same as when you set it
         httpOnly: true,
