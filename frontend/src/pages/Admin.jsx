@@ -1,8 +1,73 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { server } from "../Data";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("all-orders");
+  const { user } = useSelector((state) => state.user);
   const [orders, setOrders] = useState([]);
+  const { seller } = useSelector((state) => state.seller);
+  const [users, setUsers] = useState([]);
+  const [sellers, setSellers] = useState([]);
+  const { products } = useSelector((state) => state.products);
+  const { events } = useSelector((state) => state.events);
+  const [withdrawals, setwithdrawals] = useState([]);
+  const [admin, setAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!seller && !user) return;
+    if (
+      (seller && seller.email === "asifr.official9@gmail.com") ||
+      (user && user.email === "asifr.official9@gmail.com")
+    )
+      setAdmin(true);
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get(`${server}/order/admin/all`, {
+          withCredentials: true,
+        });
+        setOrders(res.data.orders); // handle your data here
+      } catch (error) {
+        toast.error(error);
+      }
+    };
+    const fetchwithdrawals = async () => {
+      try {
+        const res = await axios.get(`${server}/withdrawals/admin/all`, {
+          withCredentials: true,
+        });
+        setwithdrawals(res.data.withdrawal); // handle your data here
+      } catch (error) {
+        toast.error(error);
+      }
+    };
+    fetchwithdrawals();
+    const fetchSeller = async () => {
+      try {
+        const res = await axios.get(`${server}/shops/admin/all`, {
+          withCredentials: true,
+        });
+        setSellers(res.data.sellers); // handle your data here
+      } catch (error) {
+        toast.error(error);
+      }
+    };
+    const fetchusers = async () => {
+      try {
+        const res = await axios.get(`${server}/user/admin/all`, {
+          withCredentials: true,
+        });
+        setUsers(res.data.users); // handle your data here
+      } catch (error) {
+        toast.error(error);
+      }
+    };
+    fetchusers();
+    fetchOrders();
+    fetchSeller();
+  }, [user, seller]);
 
   const sidebarItems = [
     { id: "all-orders", label: "All Orders", icon: "📦" },
@@ -18,96 +83,100 @@ const AdminDashboard = () => {
       case "all-orders":
         return <AllOrders orders={orders} />;
       case "all-sellers":
-        return <AllSellers />;
+        return <AllSellers sellers={sellers} />;
       case "all-users":
-        return <AllUsers />;
+        return <AllUsers users={users} />;
       case "all-products":
-        return <AllProducts />;
+        return <AllProducts products={products} />;
       case "all-events":
-        return <AllEvents />;
+        return <AllEvents events={events} />;
       case "withdraw-requests":
-        return <WithdrawRequests />;
+        return <WithdrawRequests withdrawals={withdrawals} />;
       default:
         return <AllOrders />;
     }
   };
+  if (admin) {
+    return (
+      <div className="min-h-screen bg-background flex">
+        {/* Sidebar */}
+        <div className="w-64 bg-sidebar shadow-sm border-r">
+          {/* Header */}
+          <div className="p-6 border-b">
+            <h1 className="text-xl font-bold text-foreground">
+              Admin Dashboard
+            </h1>
+            <p className="text-sm text-gray-500">Manage your platform</p>
+          </div>
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-white shadow-sm border-r">
-        {/* Header */}
-        <div className="p-6 border-b">
-          <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-sm text-gray-500">Manage your platform</p>
+          {/* Navigation */}
+          <nav className="p-4">
+            <ul className="space-y-2">
+              {sidebarItems.map((item) => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => setActiveTab(item.id)}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                      activeTab === item.id
+                        ? "bg-primary text-primary-foreground border-r-2 border-primary-dark"
+                        : "text-foreground hover:bg-accent"
+                    }`}
+                  >
+                    <span className="text-lg">{item.icon}</span>
+                    <span className="font-medium">{item.label}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
 
-        {/* Navigation */}
-        <nav className="p-4">
-          <ul className="space-y-2">
-            {sidebarItems.map((item) => (
-              <li key={item.id}>
-                <button
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                    activeTab === item.id
-                      ? "bg-blue-50 text-blue-700 border-r-2 border-blue-500"
-                      : "text-gray-600 hover:bg-gray-50"
-                  }`}
-                >
-                  <span className="text-lg">{item.icon}</span>
-                  <span className="font-medium">{item.label}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        {/* Main Content */}
+        <div className="flex-1">{renderContent()}</div>
       </div>
-
-      {/* Main Content */}
-      <div className="flex-1">{renderContent()}</div>
-    </div>
-  );
+    );
+  }
+  return <div> unauthoried</div>;
 };
 
 // All Orders Component
 const AllOrders = ({ orders }) => {
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">All Orders</h2>
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <h2 className="text-2xl font-bold text-foreground mb-6">All Orders</h2>
+      <div className="bg-accent rounded-lg shadow-sm overflow-hidden">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b">
+          <thead className="bg-primary border-b">
             <tr>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-primary-foreground">
                 Order ID
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-primary-foreground">
                 Customer
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-primary-foreground">
                 Seller
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-primary-foreground">
                 Amount
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-primary-foreground">
                 Status
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-primary-foreground">
                 Date
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border">
             {orders.map((order) => (
-              <tr key={order.id} className="hover:bg-gray-50">
-                <td className="py-4 px-6 text-blue-600 font-medium">
-                  {order.id}
+              <tr key={order._id} className="hover:bg-gray-50">
+                <td className="py-4 px-6 text-primary font-medium">
+                  <a href={`/order/${order._id}`}> {order._id}</a>
                 </td>
-                <td className="py-4 px-6">{order.customer}</td>
-                <td className="py-4 px-6">{order.seller}</td>
-                <td className="py-4 px-6 font-semibold">{order.amount}</td>
+                <td className="py-4 px-6">{order.user.full_name}</td>
+                <td className="py-4 px-6">{order.shopId.shopName}</td>
+                <td className="py-4 px-6 font-semibold">{order.total}</td>
                 <td className="py-4 px-6">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -121,7 +190,9 @@ const AllOrders = ({ orders }) => {
                     {order.status}
                   </span>
                 </td>
-                <td className="py-4 px-6 text-gray-500">{order.date}</td>
+                <td className="py-4 px-6 text-gray-500">
+                  {new Date(order.createdAt).toLocaleDateString()}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -132,84 +203,51 @@ const AllOrders = ({ orders }) => {
 };
 
 // All Sellers Component
-const AllSellers = () => {
-  const sellers = [
-    {
-      id: 1,
-      name: "TechStore",
-      email: "tech@store.com",
-      products: 45,
-      status: "Active",
-      joined: "2023-12-01",
-    },
-    {
-      id: 2,
-      name: "Fashion Hub",
-      email: "info@fashion.com",
-      products: 123,
-      status: "Active",
-      joined: "2023-11-15",
-    },
-    {
-      id: 3,
-      name: "Electronics Plus",
-      email: "hello@electronics.com",
-      products: 67,
-      status: "Pending",
-      joined: "2024-01-10",
-    },
-  ];
-
+const AllSellers = ({ sellers }) => {
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">All Sellers</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-6">All Sellers</h2>
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Shop Name
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Email
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
-                Products
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
+                owner
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Status
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Joined
-              </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
-                Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border">
             {sellers.map((seller) => (
               <tr key={seller.id} className="hover:bg-gray-50">
-                <td className="py-4 px-6 font-medium">{seller.name}</td>
+                <td className="py-4 px-6 font-medium">{seller.shopName}</td>
                 <td className="py-4 px-6 text-gray-600">{seller.email}</td>
-                <td className="py-4 px-6">{seller.products}</td>
+                <td className="py-4 px-6">{seller.ownerName}</td>
                 <td className="py-4 px-6">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      seller.status === "Active"
+                      seller.isActive
                         ? "bg-green-100 text-green-800"
                         : "bg-yellow-100 text-yellow-800"
                     }`}
                   >
-                    {seller.status}
+                    {seller.isActive ? "yes" : "no"}
                   </span>
                 </td>
-                <td className="py-4 px-6 text-gray-500">{seller.joined}</td>
-                <td className="py-4 px-6">
-                  <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                    Edit
-                  </button>
-                </td>
+                <td className="py-4 px-6 text-gray-500">
+                  {new Date(seller.createdAt).toLocaleDateString()}
+                </td>{" "}
               </tr>
             ))}
           </tbody>
@@ -220,83 +258,47 @@ const AllSellers = () => {
 };
 
 // All Users Component
-const AllUsers = () => {
-  const users = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@email.com",
-      orders: 12,
-      status: "Active",
-      joined: "2023-10-01",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@email.com",
-      orders: 8,
-      status: "Active",
-      joined: "2023-11-20",
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike@email.com",
-      orders: 5,
-      status: "Inactive",
-      joined: "2024-01-05",
-    },
-  ];
-
+const AllUsers = ({ users }) => {
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">All Users</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-6">All Users</h2>
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Name
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Email
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
-                Orders
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
+                Verified
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
-                Status
-              </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Joined
-              </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
-                Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border">
             {users.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50">
-                <td className="py-4 px-6 font-medium">{user.name}</td>
+              <tr key={user._id} className="hover:bg-gray-50">
+                <td className="py-4 px-6 font-medium">{user.full_name}</td>
                 <td className="py-4 px-6 text-gray-600">{user.email}</td>
-                <td className="py-4 px-6">{user.orders}</td>
+
                 <td className="py-4 px-6">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      user.status === "Active"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
+                      user.isVerified
+                        ? "bg-green-300 text-green-800"
+                        : "bg-border text-gray-800"
                     }`}
                   >
-                    {user.status}
+                    {user.isVerified.toString()}
                   </span>
                 </td>
-                <td className="py-4 px-6 text-gray-500">{user.joined}</td>
-                <td className="py-4 px-6">
-                  <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                    View
-                  </button>
+                <td className="py-4 px-6 text-gray-500">
+                  {new Date(user.createdAt).toLocaleDateString()}
                 </td>
               </tr>
             ))}
@@ -308,67 +310,46 @@ const AllUsers = () => {
 };
 
 // All Products Component
-const AllProducts = () => {
-  const products = [
-    {
-      id: 1,
-      name: "iPhone 15 Pro",
-      seller: "TechStore",
-      price: "$999",
-      stock: 25,
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Nike Air Max",
-      seller: "Fashion Hub",
-      price: "$120",
-      stock: 0,
-      status: "Out of Stock",
-    },
-    {
-      id: 3,
-      name: "MacBook Pro",
-      seller: "Electronics Plus",
-      price: "$1499",
-      stock: 12,
-      status: "Active",
-    },
-  ];
-
+const AllProducts = ({ products }) => {
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">All Products</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-6">All Products</h2>
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Product Name
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Seller
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Price
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Stock
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Status
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border">
             {products.map((product) => (
-              <tr key={product.id} className="hover:bg-gray-50">
-                <td className="py-4 px-6 font-medium">{product.name}</td>
-                <td className="py-4 px-6">{product.seller}</td>
-                <td className="py-4 px-6 font-semibold">{product.price}</td>
+              <tr key={product._id} className="hover:bg-gray-50">
+                <td className="py-4 px-6 font-medium">
+                  {product.name.slice(0, 50)}
+                </td>
+                <td className="py-4 px-6">{product.shop.shopName}</td>
+                <td className="py-4 px-6 font-semibold">
+                  {product.DiscountPrice
+                    ? product.DiscountPrice
+                    : product.price}
+                </td>
                 <td className="py-4 px-6">{product.stock}</td>
                 <td className="py-4 px-6">
                   <span
@@ -382,7 +363,7 @@ const AllProducts = () => {
                   </span>
                 </td>
                 <td className="py-4 px-6">
-                  <button className="text-blue-600 hover:text-blue-800 text-sm font-medium mr-3">
+                  <button className="text-primary hover:text-blue-800 text-sm font-medium mr-3">
                     Edit
                   </button>
                   <button className="text-red-600 hover:text-red-800 text-sm font-medium">
@@ -399,83 +380,47 @@ const AllProducts = () => {
 };
 
 // All Events Component
-const AllEvents = () => {
-  const events = [
-    {
-      id: 1,
-      name: "Black Friday Sale",
-      seller: "TechStore",
-      startDate: "2024-11-29",
-      endDate: "2024-12-02",
-      status: "Upcoming",
-    },
-    {
-      id: 2,
-      name: "Summer Collection",
-      seller: "Fashion Hub",
-      startDate: "2024-06-01",
-      endDate: "2024-08-31",
-      status: "Completed",
-    },
-    {
-      id: 3,
-      name: "Electronics Clearance",
-      seller: "Electronics Plus",
-      startDate: "2024-01-15",
-      endDate: "2024-01-31",
-      status: "Active",
-    },
-  ];
-
+const AllEvents = ({ events }) => {
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">All Events</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-6">All Events</h2>
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Event Name
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Seller
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Start Date
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 End Date
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
-                Status
-              </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border">
             {events.map((event) => (
               <tr key={event.id} className="hover:bg-gray-50">
-                <td className="py-4 px-6 font-medium">{event.name}</td>
-                <td className="py-4 px-6">{event.seller}</td>
-                <td className="py-4 px-6">{event.startDate}</td>
-                <td className="py-4 px-6">{event.endDate}</td>
+                <td className="py-4 px-6 font-medium">
+                  {event.product.name.slice(0, 20)}
+                </td>
+                <td className="py-4 px-6">{event.shop.shopName}</td>
                 <td className="py-4 px-6">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      event.status === "Active"
-                        ? "bg-green-100 text-green-800"
-                        : event.status === "Upcoming"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {event.status}
-                  </span>
+                  {new Date(event.startDateTime).toLocaleDateString()}
                 </td>
                 <td className="py-4 px-6">
-                  <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                  {new Date(event.endDateTime).toLocaleDateString()}
+                </td>
+
+                <td className="py-4 px-6">
+                  <button className="text-primary hover:text-blue-800 text-sm font-medium">
                     View
                   </button>
                 </td>
@@ -489,79 +434,76 @@ const AllEvents = () => {
 };
 
 // Withdraw Requests Component
-const WithdrawRequests = () => {
-  const requests = [
-    {
-      id: 1,
-      seller: "TechStore",
-      amount: "$2,450.00",
-      method: "Bank Transfer",
-      status: "Pending",
-      date: "2024-01-17",
-    },
-    {
-      id: 2,
-      seller: "Fashion Hub",
-      amount: "$1,200.00",
-      method: "PayPal",
-      status: "Approved",
-      date: "2024-01-16",
-    },
-    {
-      id: 3,
-      seller: "Electronics Plus",
-      amount: "$3,750.00",
-      method: "Bank Transfer",
-      status: "Processing",
-      date: "2024-01-15",
-    },
-  ];
-
-  const handleApprove = (id) => {
-    console.log("Approving request:", id);
+const WithdrawRequests = ({ withdrawals }) => {
+  const handleApprove = async (id) => {
+    try {
+      await axios.put(
+        `${server}/withdrawals/${id}/status`,
+        { status: "approved" },
+        { withCredentials: true }
+      );
+      toast("Request approved!");
+      window.location.reload(); // Refresh data after update
+    } catch (err) {
+      console.error(err);
+      toast("Failed to approve request.");
+    }
   };
 
-  const handleReject = (id) => {
-    console.log("Rejecting request:", id);
+  const handleReject = async (id) => {
+    try {
+      await axios.put(
+        `${server}/withdrawals/${id}/status`,
+        { status: "rejected" },
+        { withCredentials: true }
+      );
+      toast("Request rejected!");
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      toast("Failed to reject request.");
+    }
   };
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">
+      <h2 className="text-2xl font-bold text-foreground mb-6">
         Withdraw Requests
       </h2>
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Seller
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Amount
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
-                Method
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
+                Iban
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Status
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Date
               </th>
-              <th className="text-left py-3 px-6 font-semibold text-gray-900">
+              <th className="text-left py-3 px-6 font-semibold text-foreground">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
-            {requests.map((request) => (
+          <tbody className="divide-y divide-border">
+            {withdrawals.map((request) => (
               <tr key={request.id} className="hover:bg-gray-50">
-                <td className="py-4 px-6 font-medium">{request.seller}</td>
+                <td className="py-4 px-6 font-medium">
+                  {request.sellerId.shopName}
+                </td>
                 <td className="py-4 px-6 font-semibold text-green-600">
                   {request.amount}
                 </td>
-                <td className="py-4 px-6">{request.method}</td>
+                <td className="py-4 px-6">{request.iban}</td>
                 <td className="py-4 px-6">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -575,26 +517,26 @@ const WithdrawRequests = () => {
                     {request.status}
                   </span>
                 </td>
-                <td className="py-4 px-6 text-gray-500">{request.date}</td>
+                <td className="py-4 px-6 text-gray-500">{request.createdAt}</td>
                 <td className="py-4 px-6">
-                  {request.status === "Pending" && (
+                  {request.status === "pending" && (
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleApprove(request.id)}
+                        onClick={() => handleApprove(request._id)}
                         className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
                       >
                         Approve
                       </button>
                       <button
-                        onClick={() => handleReject(request.id)}
+                        onClick={() => handleReject(request._id)}
                         className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
                       >
                         Reject
                       </button>
                     </div>
                   )}
-                  {request.status !== "Pending" && (
-                    <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                  {request.status !== "pending" && (
+                    <button className="text-primary hover:text-blue-800 text-sm font-medium">
                       View
                     </button>
                   )}

@@ -8,6 +8,7 @@ const catchAsyncError = require('../middleware/catchAsyncError');
 const sendToken = require("../util/sendToken");
 const router = express.Router();
 const { IsAuthenticated } = require('../middleware/Auth')
+const { IsAdmin } = require("../middleware/Isadmin")
 const uploadFromBuffer = require("../util/cloudinaryUploadBuffer");
 const defultImg = "https://res.cloudinary.com/dxze1vehc/image/upload/v1752658448/60111_dfcrvf.jpg";
 
@@ -62,13 +63,28 @@ router.post('/register', upload.single("avatar"), catchAsyncError(async (req, re
 
 
         res.status(201).json({
+            success: true,
             message: "User registered successfully",
         });
     } catch (error) {
         return next(new errorHandler(error.message, 400));
     }
 }));
+router.get("/admin/all", IsAdmin, catchAsyncError(async (req, res, next) => {
 
+    try {
+        //  ✅ Query based on correct field name in your Order model
+        const users = await User.find()
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            users,
+        });
+    } catch (err) {
+        return next(new errorHandler("Failed to fetch shop orders", 500));
+    }
+}));
 router.post('/activate', catchAsyncError(async (req, res, next) => {
 
     try {

@@ -1,6 +1,8 @@
 // actions/user.js
 import axios from "axios";
 import { server } from "../../Data.js";
+import { toast } from "react-toastify";
+
 
 export const loadUser = () => async (dispatch) => {
 
@@ -29,11 +31,16 @@ export const updateProfile = (formData) => async (dispatch) => {
         });
 
         dispatch({ type: "LoadUserSuccess", payload: data.user });
+        toast.success("Profile updated successfully");
     } catch (error) {
+        const errorMessage = error.response?.data?.message || "Failed to update profile";
+
         dispatch({
             type: "UserError",
-            payload: error.response?.data?.message || "Failed to update profile",
+            payload: errorMessage,
         });
+
+        toast.error(errorMessage);
     }
 };
 

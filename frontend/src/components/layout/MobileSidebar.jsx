@@ -41,11 +41,11 @@ const MobileSidebar = ({ isOpen, onClose }) => {
         </div>
         {/* Account Button */}
         <div className="relative flex flex-col gap-4 ">
-          <div className={""}>
+          <div className={"w-full h-fit"}>
             {seller ? (
               <a
                 href="/shop/dashboard"
-                className="bg-primary rounded-xl text-nowrap text-primary-foreground px-4 py-2"
+                className="bg-primary flex justify-between w-full items-center rounded-xl text-nowrap text-primary-foreground px-4 py-2"
               >
                 Go to Shop
                 <IoIosArrowForward className="inline-block w-4 h-4" />
@@ -53,7 +53,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
             ) : (
               <a
                 href="/shop/create"
-                className="bg-primary rounded-xl text-nowrap text-primary-foreground px-4 py-2"
+                className="bg-primary  flex  w-full justify-between items-center rounded-xl text-nowrap text-primary-foreground px-4 py-2"
               >
                 Become Seller
                 <IoIosArrowForward className="inline-block w-4 h-4" />

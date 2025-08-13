@@ -7,7 +7,6 @@ export default function SellerProtected({ children }) {
   const { seller, isAuthenticated, loading } = useSelector(
     (state) => state.seller
   );
-  console.log(isAuthenticated, seller);
 
   if (loading) {
     return (

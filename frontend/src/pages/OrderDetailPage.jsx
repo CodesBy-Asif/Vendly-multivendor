@@ -68,7 +68,7 @@ export default function OrderDetailsPage() {
   };
   const handleSubmitReview = async () => {
     if (!rating || !reviewText.trim()) {
-      return alert("Please fill all fields");
+      return toast("Please fill all fields");
     }
 
     try {

@@ -16,6 +16,8 @@ const RefundController = require('./controller/RefundController')
 const ConversationControler = require('./controller/ConversationControler')
 const Message = require('./controller/Messages')
 const other = require('./controller/other')
+const withdrawals = require('./controller/withdrawls')
+
 const app = express();
 
 // Middleware
@@ -30,7 +32,6 @@ app.use(cors({
     credentials: true,
 }
 ));
-
 app.use("/api/v2/user", userController)
 app.use("/api/v2/shops", ShopContoller);
 app.use("/api/v2/product", ProductController);
@@ -43,8 +44,7 @@ app.use("/api/v2/refunds", RefundController);
 app.use("/api/v2/conversation", ConversationControler);
 app.use("/api/v2/messages", Message);
 app.use("/api/v2", other);
-
-
+app.use("/api/v2/withdrawals", withdrawals);
 
 
 

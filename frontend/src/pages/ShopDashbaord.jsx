@@ -42,7 +42,6 @@ export default function ShopDashboard() {
     fetchStats();
     fetchOrders();
   }, []);
-  console.log(recentOrders);
   const getStatusColor = (status) => {
     const colors = {
       pending: "bg-yellow-100 text-yellow-800",
@@ -89,7 +88,7 @@ export default function ShopDashboard() {
     <div className="min-h-screen bg-gray-50 p-6">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Shop Dashboard</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <StatCard
           title="Total Revenue"
           value={dashboardStats?.revenue || 0}
@@ -100,6 +99,16 @@ export default function ShopDashboard() {
           title="Total Orders"
           value={dashboardStats?.orders || 0}
           icon={ShoppingCart}
+        />
+        <StatCard
+          title="Total Products"
+          value={dashboardStats?.totalProducts || 0}
+          icon={ShoppingCart} // maybe use a package box icon instead
+        />
+        <StatCard
+          title="Running Events"
+          value={dashboardStats?.totalRunningEvents || 0}
+          icon={ShoppingCart} // maybe use a calendar or event icon
         />
       </div>
 

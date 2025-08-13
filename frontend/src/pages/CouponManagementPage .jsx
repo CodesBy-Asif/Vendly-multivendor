@@ -26,7 +26,9 @@ const CouponManagementPage = () => {
         });
         setCoupons(data.coupons);
       } catch (error) {
-        alert(error?.response?.data?.message || "Failed to fetch coupons");
+        toast.error(
+          error?.response?.data?.message || "Failed to fetch coupons"
+        );
       }
     };
 
@@ -142,7 +144,7 @@ const CouponManagementPage = () => {
       });
       setShowCreateForm(true);
     } catch (err) {
-      alert(err?.response?.data?.message || "Failed to fetch coupon");
+      toast.error(err?.response?.data?.message || "Failed to fetch coupon");
     }
   };
 
@@ -154,7 +156,7 @@ const CouponManagementPage = () => {
       !formData.maxPrice ||
       !formData.quantity
     ) {
-      alert("Please fill in all required fields");
+      toast("Please fill in all required fields");
       return;
     }
 
@@ -178,7 +180,7 @@ const CouponManagementPage = () => {
       );
       resetForm();
     } catch (err) {
-      alert(err?.response?.data?.message || "Failed to update coupon");
+      toast.error(err?.response?.data?.message || "Failed to update coupon");
     }
   };
 
@@ -196,7 +198,7 @@ const CouponManagementPage = () => {
         )
       );
     } catch (err) {
-      alert(err?.response?.data?.message || "Failed to toggle status");
+      toast.error(err?.response?.data?.message || "Failed to toggle status");
     }
   };
 
@@ -208,7 +210,7 @@ const CouponManagementPage = () => {
         });
         setCoupons((prev) => prev.filter((c) => c._id !== id));
       } catch (err) {
-        alert(err?.response?.data?.message || "Failed to delete coupon");
+        toast.error(err?.response?.data?.message || "Failed to delete coupon");
       }
     }
   };

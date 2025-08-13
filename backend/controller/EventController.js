@@ -63,15 +63,13 @@ router.post(
     await product.save();
 
     let thumbnail = {};
+    console.log(req.files["thumbnail"])
     if (req.files && req.files["thumbnail"]) {
-      const filePath = req.files["thumbnail"][0].path; // multer storage 'diskStorage' required
-      const result = await cloudinary.uploader.upload(filePath, {
-        folder: "events/thumbnail",
-      });
-      thumbnail = {
-        url: result.secure_url,
-        public_id: result.public_id,
-      };
+      const thumbUpload = await uploadFromBuffer(
+        req.files["thumbnail"][0].buffer,
+        "events/thumbnail"
+      );
+      thumbnail = thumbUpload;
     }
 
 
@@ -263,22 +261,12 @@ router.delete(
       await cloudinary.uploader.destroy(event.thumbnail.public_id);
     }
 
-    const imageDeletionResults = await Promise.all(
-      event.images.map(async (img) => {
-        try {
-          return await cloudinary.uploader.destroy(img.public_id);
-        } catch (err) {
-          console.error("Error deleting event image:", err.message);
-        }
-      })
-    );
 
     await event.deleteOne();
 
     res.status(200).json({
       success: true,
       message: "Event and images deleted successfully",
-      imageDeletionResults,
     });
   })
 );

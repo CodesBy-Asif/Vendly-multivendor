@@ -39,6 +39,7 @@ const CreateProductPage = () => {
   const [currentTag, setCurrentTag] = useState("");
   const [activeTab, setActiveTab] = useState("basic");
   const [dragOver, setDragOver] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const tabs = [
     { id: "basic", label: "Basic Info", icon: Info },
@@ -130,6 +131,7 @@ const CreateProductPage = () => {
   };
 
   const handlePublish = async () => {
+    setLoading(true);
     const formData = new FormData();
 
     const finalData = {
@@ -162,32 +164,39 @@ const CreateProductPage = () => {
       }
     });
 
-    const success = await dispatch(createProduct(formData));
-    setTimeout(() => {
-      dispatch(LoadSeller());
-    }, 1500);
-    if (success) {
-      toast.success("Product published successfully!");
+    try {
+      const success = await dispatch(createProduct(formData));
+      if (success) {
+        toast.success("Product published successfully!");
+        dispatch(LoadSeller());
 
-      setProductData({
-        name: "",
-        description: "",
-        shortDescription: "",
-        category: "",
-        brand: "",
-        sku: "",
-        price: "",
-        DiscountPrice: "",
-        stock: "",
-        weight: "",
-        dimensions: { length: "", width: "", height: "" },
-        status: "draft",
-        featured: false,
-        tags: [],
-        images: [],
-      });
-      setCurrentTag("");
-      setActiveTab("basic");
+        // Reset form after success
+        setProductData({
+          name: "",
+          description: "",
+          shortDescription: "",
+          category: "",
+          brand: "",
+          sku: "",
+          price: "",
+          DiscountPrice: "",
+          stock: "",
+          weight: "",
+          dimensions: { length: "", width: "", height: "" },
+          status: "draft",
+          featured: false,
+          tags: [],
+          images: [],
+        });
+        setCurrentTag("");
+        setActiveTab("basic");
+      } else {
+        toast.error("Failed to publish product. Please try again.");
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
@@ -524,10 +533,38 @@ const CreateProductPage = () => {
           <div className="flex items-center space-x-3">
             <button
               onClick={handlePublish}
-              className="flex items-center space-x-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+              disabled={loading}
+              className={`flex items-center space-x-2 px-6 py-2 rounded-lg transition-colors ${
+                loading
+                  ? "bg-primary/70 cursor-not-allowed"
+                  : "bg-primary text-primary-foreground hover:bg-primary/90"
+              }`}
             >
-              <Save size={16} />
-              <span>Publish Product</span>
+              {loading ? (
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+              ) : (
+                <Save size={16} />
+              )}
+              <span>{loading ? "Publishing..." : "Publish Product"}</span>
             </button>
           </div>
         </div>

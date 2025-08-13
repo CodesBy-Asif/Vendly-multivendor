@@ -106,7 +106,7 @@ export default function ShopOrderManagement() {
     shipped: shopOrders.filter((o) => o.status === "shipped").length,
     delivered: shopOrders.filter((o) => o.status === "delivered").length,
     revenue: shopOrders.reduce(
-      (sum, o) => sum + (o.status !== "cancelled" ? o.totalAmount : 0),
+      (sum, o) => sum + (o.status !== "cancelled" ? o.total : 0),
       0
     ),
   };

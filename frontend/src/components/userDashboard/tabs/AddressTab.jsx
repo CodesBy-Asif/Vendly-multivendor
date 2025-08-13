@@ -376,7 +376,7 @@ function AddressTab() {
         ) : (
           addresses.map((address) => (
             <div
-              key={address.id}
+              key={address._id}
               className="bg-card border border-border rounded-lg p-6"
             >
               <div className="flex items-start justify-between">

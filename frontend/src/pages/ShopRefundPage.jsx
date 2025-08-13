@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { server } from "../Data";
+import { toast } from "react-toastify";
 
 function ShopRefundPage() {
   const [activeTab, setActiveTab] = useState("all");
@@ -64,7 +65,9 @@ function ShopRefundPage() {
         )
       );
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to update refund status");
+      toast.error(
+        err.response?.data?.message || "Failed to update refund status"
+      );
     }
   };
 

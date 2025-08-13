@@ -10,54 +10,55 @@ import {
 } from "lucide-react";
 import { server } from "../../../Data";
 import axios from "axios";
+import ConfirmDialog from "../../ui/ConfirmationDialog";
+import { toast } from "react-toastify";
 
 function OrdersTab() {
   const [activeTab, setActiveTab] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const ORDERS_PER_PAGE = 10;
   const [orders, setOrders] = useState([]);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get(`${server}/order/user/orders`, {
+        withCredentials: true, // send cookies/auth headers
+      });
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await axios.get(`${server}/order/user/orders`, {
-          withCredentials: true, // send cookies/auth headers
-        });
+      const data = response.data;
 
-        const data = response.data;
-
-        if (data.success) {
-          setOrders(data.orders);
-        } else {
-          console.error("Failed to fetch orders:", data.message);
-        }
-      } catch (error) {
-        console.error("Error fetching orders:", error);
+      if (data.success) {
+        setOrders(data.orders);
+      } else {
+        console.error("Failed to fetch orders:", data.message);
       }
-    };
-
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+  useEffect(() => {
     fetchOrders();
   }, []);
-  const handleRefund = async (orderId) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to request a refund for this order?"
-      )
-    )
-      return;
+  const openConfirmDialog = (orderId) => {
+    setSelectedOrderId(orderId);
+    setIsConfirmOpen(true);
+  };
 
+  const handleConfirmRefund = async () => {
+    setIsConfirmOpen(false);
     try {
       const res = await axios.post(
-        `${server}/refunds/${orderId}`,
+        `${server}/refunds/${selectedOrderId}`,
         { reason: "Customer requested refund" },
         { withCredentials: true }
       );
 
-      alert(res.data.message || "Refund request sent.");
-      fetchOrders(); // refresh orders
+      toast.success(res.data.message || "Refund request sent.");
+      fetchOrders(); // refresh orders, note: we need to move fetchOrders outside useEffect or re-trigger somehow
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || "Failed to request refund.");
+      toast.error(err.response?.data?.message || "Failed to request refund.");
     }
   };
 
@@ -134,7 +135,6 @@ function OrdersTab() {
       setCurrentPage(1);
     }
   }, [filteredOrders]);
-  console.log(filteredOrders);
   const tabs = [
     { id: "all", label: "All Orders", count: orders.length },
     {
@@ -213,7 +213,7 @@ function OrdersTab() {
           <div className="divide-y divide-border">
             {paginatedOrders.map((order) => (
               <div
-                key={order.id}
+                key={order._id}
                 className="px-6 py-4 hover:bg-muted/30 transition-colors"
               >
                 <div className="grid grid-cols-5 gap-6 items-center">
@@ -254,8 +254,8 @@ function OrdersTab() {
                     </a>
                     {canRefund(order.status, order.payment.method) && (
                       <button
-                        onClick={() => handleRefund(order._id)}
-                        className="flex  text-nowrap items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm"
+                        onClick={() => openConfirmDialog(order._id)}
+                        className="flex text-nowrap items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm"
                       >
                         <RotateCcw className="w-4 h-4" />
                         {order.payment.method === "cod" ? (
@@ -297,6 +297,15 @@ function OrdersTab() {
           )}
         </div>
       )}
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        title="Confirm Refund"
+        message="Are you sure you want to request a refund for this order?"
+        confirmText="Yes, Refund"
+        cancelText="Cancel"
+        onConfirm={handleConfirmRefund}
+        onCancel={() => setIsConfirmOpen(false)}
+      />
     </div>
   );
 }

@@ -346,10 +346,10 @@ const CreateEventPage = () => {
               </label>
 
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-                {formData.thumbnail ? (
+                {formData.thumbnailPreview ? (
                   <div className="relative inline-block">
                     <img
-                      src={URL.createObjectURL(formData.thumbnail)}
+                      src={formData.thumbnailPreview}
                       alt="Thumbnail"
                       className=" object-cover rounded-lg shadow-md"
                     />
@@ -358,7 +358,8 @@ const CreateEventPage = () => {
                       onClick={() =>
                         setFormData((prev) => ({
                           ...prev,
-                          thumbnail: null,
+                          thumbnailFile: null, // clear the actual file
+                          thumbnailPreview: "", // clear the preview URL
                         }))
                       }
                       className="absolute -top-2 -right-2 bg-red-500 text-primary-foreground rounded-full p-1 hover:bg-red-600 transition-colors"
@@ -378,7 +379,8 @@ const CreateEventPage = () => {
                         if (file) {
                           setFormData((prev) => ({
                             ...prev,
-                            thumbnail: file, // Store the File object
+                            thumbnailFile: file, // use thumbnailFile
+                            thumbnailPreview: URL.createObjectURL(file),
                           }));
                         }
                       }}

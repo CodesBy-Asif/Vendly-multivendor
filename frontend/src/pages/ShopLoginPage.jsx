@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { server } from "../Data";
+import { toast } from "react-toastify";
 
 function ShopLoginPage() {
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
@@ -58,7 +59,7 @@ function ShopLoginPage() {
           payload: shop,
         });
 
-        alert("Login successful!");
+        toast.success("Login successful!");
         navigate(`/shop/dashboard`);
       }
     } catch (error) {

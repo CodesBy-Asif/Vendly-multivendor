@@ -3,40 +3,51 @@ const router = express.Router();
 const Order = require("../models/Order");
 const { isSellerAuthenticated } = require('../middleware/isSellerAuthenticated');
 const catchAsyncError = require("../middleware/catchAsyncError");
-const errorHandler = require("../util/errorHandler");
+
+const Withdrawal = require("../models/withdraws");
+const Product = require("../models/Product");
+const Event = require("../models/Event");
 
 // GET /dashboard/stats
+// server/routes/dashboard.js
 router.get(
-    "/dashboard/stats", isSellerAuthenticated,
+    "/dashboard/stats",
+    isSellerAuthenticated,
     catchAsyncError(async (req, res) => {
-        const shopId = req.shop._id
-        // Make sure to use the correct field name here: 'total' or 'subtotal' instead of 'amount'
-        const stats = await Order.aggregate([
-            { $match: { shopId: shopId } }, {
-                $group: {
-                    _id: null,
-                    totalRevenue: { $sum: "$total" },  // Change this if your schema uses a different field
-                    totalOrders: { $sum: 1 },
-                },
-            },
+        const shopId = req.shop._id;
+
+        const revenueStats = await Order.aggregate([
+            { $match: { shopId, status: "delivered" } },
+            { $group: { _id: null, totalRevenue: { $sum: "$total" }, ordersCount: { $sum: 1 } } }
         ]);
 
+        const totalProducts = await Product.countDocuments({ shop: shopId });
+        const totalRunningEvents = await Event.countDocuments({
+            shop: shopId,
+            endDateTime: { $gte: new Date() } // only future or ongoing events
+        });
+
         res.json({
+            success: true,
             stats: {
-                revenue: stats[0]?.totalRevenue || 0,
-                orders: stats[0]?.totalOrders || 0,
-            },
+                revenue: revenueStats[0]?.totalRevenue || 0,
+                orders: revenueStats[0]?.ordersCount || 0,
+                totalProducts,
+                totalRunningEvents
+            }
         });
     })
 );
+
 router.get(
     "/dashboard/stats/delivered",
     isSellerAuthenticated,
     catchAsyncError(async (req, res) => {
         const shopId = req.shop._id;
 
+        // Step 1: Get total delivered revenue
         const deliveredStats = await Order.aggregate([
-            { $match: { shopId: shopId, status: "delivered" } }, // Only delivered orders
+            { $match: { shopId: shopId, status: "delivered" } },
             {
                 $group: {
                     _id: null,
@@ -46,15 +57,42 @@ router.get(
             },
         ]);
 
+        const totalDeliveredRevenue = deliveredStats[0]?.totalDeliveredRevenue || 0;
+        const deliveredOrdersCount = deliveredStats[0]?.deliveredOrdersCount || 0;
+
+        // Step 2: Get total pending or approved withdrawals
+        const withdrawalStats = await Withdrawal.aggregate([
+            {
+                $match: {
+                    sellerId: shopId,
+                    status: { $in: ["pending", "approved"] }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalRequested: { $sum: "$amount" }
+                }
+            }
+        ]);
+        const totalRequestedWithdrawals = withdrawalStats[0]?.totalRequested || 0;
+        console.log()
+
+        // Step 3: Calculate available balance
+        const availableBalance = totalDeliveredRevenue - totalRequestedWithdrawals;
+
         res.json({
             success: true,
             stats: {
-                totalDeliveredRevenue: deliveredStats[0]?.totalDeliveredRevenue || 0,
-                deliveredOrdersCount: deliveredStats[0]?.deliveredOrdersCount || 0,
+                totalDeliveredRevenue,
+                deliveredOrdersCount,
+                totalRequestedWithdrawals,
+                availableBalance
             },
         });
     })
 );
+
 
 // GET /orders/recent
 router.get(

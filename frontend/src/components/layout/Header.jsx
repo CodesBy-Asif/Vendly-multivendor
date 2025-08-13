@@ -74,7 +74,7 @@ function Header({ sticky }) {
       <header className="bg-accent z-10 border-b border-border shadow-sm relative">
         <div className="flex gap-8 sm:px-8 px-4 py-4 justify-between items-center ">
           <Link to={"/"}>
-            <h1 className="800text-3xl text-2xl tracking-wider font-Title  text-primary">
+            <h1 className="800:text-3xl text-2xl tracking-wider font-Title  text-primary">
               Vendly
             </h1>
           </Link>

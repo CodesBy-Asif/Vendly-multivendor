@@ -34,14 +34,12 @@ function RefundTab() {
         const response = await axios.get(`${server}/refunds/my-refunds`, {
           withCredentials: true, // include cookies/auth headers
         });
-        console.log("a");
         if (response.data.success) {
           setRefunds(response.data.refunds);
         } else {
           setError("Failed to load refunds.");
         }
       } catch (err) {
-        console.log("a");
         console.log(err.response?.data?.message || "Something went wrong.");
       } finally {
         setLoading(false);
@@ -120,7 +118,6 @@ function RefundTab() {
       count: refunds.filter((r) => r.status === "rejected").length,
     },
   ];
-  console.log(filteredRefunds);
   return (
     <div className="max-w-6xl mx-auto p-6 bg-background">
       <div className="mb-8">

@@ -6,14 +6,23 @@ import { useDispatch } from "react-redux";
 import { deleteProduct } from "../../redux/actions/product";
 import { toast } from "react-toastify";
 import { LoadSeller } from "../../redux/actions/seller";
+import Loader from "../Loader";
+import ConfirmDialog from "./ConfirmDialog";
 
 const ShopAllProductsPage = () => {
   const [viewMode, setViewMode] = useState("grid");
   const [filter, setFilter] = useState("");
   const [search, setSearch] = useState("");
   const dispatch = useDispatch();
-  const { seller } = useSelector((state) => state.seller);
-  console.log(seller);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const { seller, loading } = useSelector((state) => state.seller);
+
+  const openDeleteDialog = (product) => {
+    setSelectedProduct(product);
+    setConfirmOpen(true);
+  };
+
   const filtered = [...seller.products]
     .filter((p) => p.name.toLowerCase().includes(search.trim().toLowerCase()))
     .sort((a, b) => {
@@ -22,22 +31,26 @@ const ShopAllProductsPage = () => {
       if (filter === "rating") return b.rating - a.rating;
       return 0;
     });
-  const handleDelete = async (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this product?"
-    );
-    if (!confirmed) return;
-
-    const success = await dispatch(deleteProduct(id));
+  const handleConfirmDelete = async () => {
+    if (!selectedProduct) return;
+    setConfirmOpen(false);
+    const success = await dispatch(deleteProduct(selectedProduct._id));
     if (success) {
-      setTimeout(() => {
-        dispatch(LoadSeller());
-      }, 1500);
       toast.success("Product deleted");
+      dispatch(LoadSeller());
     }
+    setConfirmOpen(false);
+    setSelectedProduct(null);
   };
+
+  const handleCancelDelete = () => {
+    setConfirmOpen(false);
+    setSelectedProduct(null);
+  };
+
+  if (loading) return <Loader />;
   if (!seller) return <div className="p-6 text-red-500">Shop not found</div>;
-  console.log(filtered[0]);
+
   return (
     <div className="max-w-7xl mx-auto px-8  py-8 bg-accent rounded-2xl">
       <h1 className="text-3xl font-bold mb-6 text-primary">
@@ -159,7 +172,7 @@ const ShopAllProductsPage = () => {
                   Edit
                 </a>
                 <button
-                  onClick={() => handleDelete(product._id)}
+                  onClick={() => openDeleteDialog(product)}
                   className="text-sm text-nowrap w-full text-center bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700"
                 >
                   Delete
@@ -169,6 +182,13 @@ const ShopAllProductsPage = () => {
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete Product"
+        message={`Are you sure you want to delete "${selectedProduct?.name}"? This action cannot be undone.`}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 };

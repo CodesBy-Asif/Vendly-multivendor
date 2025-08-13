@@ -8,6 +8,7 @@ const catchAsyncError = require('../middleware/catchAsyncError');
 const uploadFromBuffer = require("../util/cloudinaryUploadBuffer");
 const { isSellerAuthenticated } = require("../middleware/isSellerAuthenticated");
 const Product = require('../models/Product');
+const { IsAdmin } = require("../middleware/Isadmin");
 
 const router = express.Router();
 const cookieOptions = {
@@ -93,6 +94,22 @@ router.post('/register', upload.single("logo"), catchAsyncError(async (req, res,
         });
     } catch (err) {
         return next(new errorHandler("Email failed: " + err.message, 500));
+    }
+}));
+
+router.get("/admin/all", IsAdmin, catchAsyncError(async (req, res, next) => {
+
+    try {
+        //  ✅ Query based on correct field name in your Order model
+        const sops = await Shop.find()
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            sellers: sops,
+        });
+    } catch (err) {
+        return next(new errorHandler("Failed to fetch shop orders", 500));
     }
 }));
 

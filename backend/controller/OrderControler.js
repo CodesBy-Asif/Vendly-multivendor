@@ -6,6 +6,7 @@ const { IsAuthenticated } = require('../middleware/Auth');
 const Product = require("../models/Product"); // Make sure you import the Product model
 const { isSellerAuthenticated } = require("../middleware/isSellerAuthenticated");
 const { IsAdmin } = require("../middleware/Isadmin");
+const { path } = require("../app");
 const router = express.Router();
 
 router.post(
@@ -135,8 +136,7 @@ router.get("/user/orders", IsAuthenticated, catchAsyncError(async (req, res, nex
         return next(new errorHandler("Failed to retrieve user orders", 500));
     }
 }));
-
-router.get("/all", IsAdmin, catchAsyncError(async (req, res, next) => {
+router.get("/admin/all", IsAdmin, catchAsyncError(async (req, res, next) => {
 
     try {
         //  ✅ Query based on correct field name in your Order model
@@ -149,6 +149,10 @@ router.get("/all", IsAdmin, catchAsyncError(async (req, res, next) => {
             .populate({
                 path: "items.product",
                 select: "name price images stock",
+            })
+            .populate({
+                path: "shopId",
+                select: "-password"
             });
 
         res.status(200).json({
@@ -190,6 +194,8 @@ router.get(
         }
     })
 );
+
+
 
 // UPDATE ORDER (Seller only)
 router.put(

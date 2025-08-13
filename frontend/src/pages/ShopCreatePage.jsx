@@ -3,6 +3,7 @@ import { Store, Upload, Check } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { createShop, resetShopCreation } from "../redux/actions/seller"; // <-- your action creators
+import { toast } from "react-toastify";
 
 function ShopCreatePage() {
   const dispatch = useDispatch();
@@ -36,7 +37,7 @@ function ShopCreatePage() {
 
   useEffect(() => {
     if (shopCreationSuccess) {
-      alert("Shop registered successfully! Please verify via email.");
+      toast.success("Shop registered successfully! Please verify via email.");
       dispatch(resetShopCreation()); // reset state after success
       // Optionally clear form or navigate
       // navigate('/shop/login'); // or wherever you want
