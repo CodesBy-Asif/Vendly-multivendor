@@ -95,15 +95,6 @@ export default function PaymentForm({ onSubmit, totalAmount, clientSecret }) {
           />
           <span className="px-2">Credit/Debit Card</span>
         </label>
-        <label>
-          <input
-            type="radio"
-            value="paypal"
-            checked={paymentMethod === "paypal"}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-          />
-          PayPal
-        </label>
       </div>
 
       <>
