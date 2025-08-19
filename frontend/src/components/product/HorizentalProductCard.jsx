@@ -11,6 +11,7 @@ import {
   isFavorite as isFavoriteFn,
 } from "../../redux/actions/Favirotes";
 import { useSelector, useDispatch } from "react-redux";
+import { addToCart } from "../../redux/actions/Cart";
 
 const HorizontalProductCard = ({ product }) => {
   const { favorites } = useSelector((state) => state.favorites);

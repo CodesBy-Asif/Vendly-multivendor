@@ -23,6 +23,8 @@ function CheckoutPage() {
   const navigate = useNavigate();
 
   const { cart } = useSelector((state) => state.cart);
+  const { user } = useSelector((state) => state.user);
+
   const dispatch = useDispatch();
   const [currentStep, setCurrentStep] = useState(1);
   const [mobileOrderSummaryOpen, setMobileOrderSummaryOpen] = useState(false);
@@ -222,6 +224,26 @@ function CheckoutPage() {
       );
     }
   };
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-background px-4">
+        <ShoppingCart size={80} className="text-muted-foreground mb-6" />
+        <h1 className="text-3xl font-semibold text-foreground mb-2">
+          You are not logged in
+        </h1>
+        <p className="text-muted-foreground mb-6 text-center max-w-md">
+          Please log in to view your cart and continue with your shopping
+          experience.
+        </p>
+        <Link
+          to="/login"
+          className="bg-primary text-primary-foreground px-6 py-3 rounded-md shadow hover:bg-primary/90 transition"
+        >
+          Login
+        </Link>
+      </div>
+    );
+  }
 
   if (!cart.length) {
     return (
