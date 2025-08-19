@@ -43,7 +43,7 @@ const AccountMenu = (prop) => {
 
       {open && (
         <div
-          className={`absolute -left-[0] md:left-0 w-max md:w-full ${
+          className={`absolute -right-[10px] md:left-0 w-max md:w-full ${
             prop.bottom ? "bottom-full mb-2" : " mt-2 top-full"
           } bg-white shadow-lg rounded-md py-2 z-50`}
         >
