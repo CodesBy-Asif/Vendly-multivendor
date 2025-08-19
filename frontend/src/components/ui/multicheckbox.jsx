@@ -2,7 +2,6 @@ import { useState } from "react";
 
 export const CustomMultiSelect = ({ options, selected, onChange }) => {
   const [open, setOpen] = useState(false);
-  console.log(selected);
   const toggleOption = (value) => {
     if (selected.includes(value)) {
       onChange(selected.filter((v) => v !== value));

@@ -37,9 +37,6 @@ const ProductDetailsDialog = ({ product, isOpen, onClose }) => {
       );
 
       if (data.success) {
-        // Conversation created or found, now you can redirect to inbox/chat page
-        console.log("Conversation:", data.conversation);
-
         // For example, navigate to conversation detail page with conversation._id
         navigate(`/dashbaord/inbox`);
       }

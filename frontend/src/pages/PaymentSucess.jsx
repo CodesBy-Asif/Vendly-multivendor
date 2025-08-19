@@ -13,7 +13,6 @@ export function PaymentSuccess() {
   const paymentIntent = params.get("payment_intent");
   const method = params.get("method"); // "card" or "cod"
   const status = params.get("redirect_status"); // "succeeded" or "failed" or something else
-  console.log(method, status);
   const handleGoHome = () => {
     navigate("/");
   };

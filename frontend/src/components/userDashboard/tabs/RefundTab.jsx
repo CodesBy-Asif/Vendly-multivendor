@@ -13,6 +13,7 @@ import {
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { server } from "../../../Data";
+import { toast } from "react-toastify";
 
 function RefundTab() {
   const [activeTab, setActiveTab] = useState("all");
@@ -40,7 +41,7 @@ function RefundTab() {
           setError("Failed to load refunds.");
         }
       } catch (err) {
-        console.log(err.response?.data?.message || "Something went wrong.");
+        toast.error(err.response?.data?.message || "Something went wrong.");
       } finally {
         setLoading(false);
       }

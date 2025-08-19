@@ -62,7 +62,6 @@ const CouponManagementPage = () => {
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    console.log(formData);
   };
   const resetForm = () => {
     setFormData({

@@ -39,7 +39,6 @@ const ShopAllEventsPage = () => {
   let filtered = sellerEvents.filter((event) =>
     event.product.name.toLowerCase().includes(search.trim().toLowerCase())
   );
-  console.log(sellerEvents);
   filtered = filtered.sort((a, b) => {
     if (filter === "latest")
       return new Date(b.createdAt) - new Date(a.createdAt);

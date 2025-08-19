@@ -76,7 +76,6 @@ const AuthForm = (prop) => {
 
     try {
       const data = await registerUser(name, Email, Password);
-      console.log(data);
       if (data?.success) {
         toast.success(data.message);
         setTimeout(() => {

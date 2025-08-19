@@ -158,7 +158,6 @@ export default function PaymentForm({ onSubmit, totalAmount, clientSecret }) {
                 }
                 onApprove={(data, actions) =>
                   actions.order.capture().then((details) => {
-                    console.log("PayPal Payment Approved:", details);
                     onSubmit({ method: "paypal", details });
                   })
                 }
