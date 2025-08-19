@@ -64,7 +64,7 @@ router.post('/register', upload.single("avatar"), catchAsyncError(async (req, re
 
         res.status(201).json({
             success: true,
-            message: "User registered successfully",
+            message: "User registered successfully. Check you Email for Verification Message",
         });
     } catch (error) {
         return next(new errorHandler(error.message, 400));
@@ -125,7 +125,7 @@ router.post("/login", catchAsyncError(async (req, res, next) => {
             return next(new errorHandler("Invalid email or password", 401));
         }
         if (!user.isVerified) {
-            return next(new errorHandler("User not verified ", 401));
+            return next(new errorHandler("User not verified, please check you mail for verification", 401));
         }
         user.password = undefined;
 
