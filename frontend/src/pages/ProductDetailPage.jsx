@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { BiUpload } from "react-icons/bi";
 import { AiOutlineHeart } from "react-icons/ai";
 import { useSelector } from "react-redux";
+import { addToCart } from "../redux/actions/Cart";
 
 function ProductDetailPage() {
   const { id } = useParams();
