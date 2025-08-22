@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { BiUpload } from "react-icons/bi";
 import { AiOutlineHeart } from "react-icons/ai";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { addToCart } from "../redux/actions/Cart";
 
 function ProductDetailPage() {
@@ -12,7 +12,7 @@ function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
-
+  const dispatch = useDispatch();
   const { seller } = useSelector((state) => state.seller);
   const { products, loading } = useSelector((state) => state.products);
   useEffect(() => {
@@ -188,7 +188,8 @@ function ProductDetailPage() {
             <button
               className="bg-primary w-full md:w-1/2 text-white px-6 py-2 rounded hover:bg-primary-dark transition"
               onClick={() => {
-                dispatch(addToCart(data));
+                dispatch(addToCart(data, quantity));
+                console.log("Added to cart");
               }}
             >
               Add to Cart
