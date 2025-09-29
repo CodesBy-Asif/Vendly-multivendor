@@ -132,7 +132,6 @@ const InboxPage = ({ userType }) => {
       );
 
       if (data.success) {
-        setMessages((prev) => [...prev, data.message]);
         setNewMessage("");
 
         if (socket) {

@@ -115,8 +115,7 @@ const InboxPage = ({ userType }) => {
       );
 
       if (data.success) {
-        // Optimistic update
-        setMessages((prev) => [...prev, data.message]);
+
         setNewMessage("");
 
         // Emit socket event
