@@ -21,7 +21,7 @@ const InboxPage = ({ userType }) => {
   useEffect(() => {
     if (!user && !seller) return;
 
-    const s = io("https://vendly-backend.vercel.app/", {
+    const s = io("https://vendly-multivendor.onrender.com/", {
       withCredentials: true,
       transports: ["websocket"],
     });

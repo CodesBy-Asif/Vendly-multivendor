@@ -12,8 +12,8 @@ function HomePage() {
         <HeroSection/>
          <BrandingSection/>
          <BestDeals/>
-         <EventSections/>
-         <FeaturedProducts/>
+         {/* <EventSections/>
+         <FeaturedProducts/> */}
          <Sponsered/>
      </>
     );
