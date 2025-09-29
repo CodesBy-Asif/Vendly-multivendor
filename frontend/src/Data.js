@@ -1,1 +1,1 @@
-export const server = "https://vendly-multivendor.onrender.com/api/v2/";
+export const server = "https://vendly-multivendor.onrender.com/api/v2";
