@@ -51,7 +51,8 @@ app.use("/api/v2/withdrawals", withdrawals);
 
 // Example Route (you should add your routes here)
 app.get("/", (req, res) => {
-    res.send("API is running...");
+    res.send("API is running..."+process.env.ORIGIN);
+
 });
 
 
