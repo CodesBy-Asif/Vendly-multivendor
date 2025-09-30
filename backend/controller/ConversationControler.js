@@ -42,7 +42,7 @@ router.post(
                 groupTitle,
                 members: [
                     { memberId: userId, memberModel: "User" },
-                    { memberId: sellerId, memberModel: "Seller" }
+                    { memberId: sellerId, memberModel: "Shop" }
                 ],
             });
 

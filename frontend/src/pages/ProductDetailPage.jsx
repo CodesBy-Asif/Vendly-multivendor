@@ -61,9 +61,7 @@ function ProductDetailPage() {
       });
   };
   if (loading) {
-    return (
-      <div className="p-4 text-center text-lg">Loading product details...</div>
-    );
+    return <Loader />;
   }
 
   if (!data) {

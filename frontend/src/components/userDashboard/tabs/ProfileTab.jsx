@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import axios from "axios";
-import { server } from "../../../Data.js";
 import {
   updateProfile,
   updateAvatar,

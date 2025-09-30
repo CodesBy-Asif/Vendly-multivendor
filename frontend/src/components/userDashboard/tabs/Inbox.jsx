@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { server } from "../../../Data";
+import { server } from "../../../Data"; // define these separately
 import { useSelector } from "react-redux";
+import { io } from "socket.io-client";
 
 const InboxPage = ({ userType }) => {
   const [conversations, setConversations] = useState([]);
@@ -13,18 +14,46 @@ const InboxPage = ({ userType }) => {
   const [newMessage, setNewMessage] = useState("");
   const [loadingMessages, setLoadingMessages] = useState(false);
 
+  // socket state
+  const [socket, setSocket] = useState(null);
+
+  // init socket connection
+  useEffect(() => {
+    if (!user && !seller) return;
+
+    const s = io("https://vendly-backend.vercel.app/", {
+      withCredentials: true,
+      transports: ["websocket"],
+    });
+
+    setSocket(s);
+
+    s.on("connect", () => {
+      console.log("✅ Connected to socket:", s.id);
+    });
+
+    s.on("disconnect", () => {
+      console.log("❌ Disconnected from socket");
+    });
+
+    return () => {
+      s.disconnect();
+    };
+  }, [user, seller]);
+
+  // fetch conversations
   useEffect(() => {
     if (!user && !seller) return;
     const fetchConversations = async () => {
       try {
         const url =
           userType === "seller"
-            ? `${server}/conversation/get-all-conversation-seller/${user._id}`
-            : `${server}/conversation/get-all-conversation-user/${seller._id}`;
+            ? `${server}/conversation/get-all-conversation-seller/${seller._id}`
+            : `${server}/conversation/get-all-conversation-user/${user._id}`;
+
         const { data } = await axios.get(url, { withCredentials: true });
         if (data.success) {
           setConversations(data.conversations);
-          // Auto-select first conversation if available
           if (data.conversations.length > 0) {
             setSelectedConversation(data.conversations[0]);
           }
@@ -38,6 +67,8 @@ const InboxPage = ({ userType }) => {
 
     fetchConversations();
   }, [userType, user, seller]);
+
+  // fetch messages when a conversation is selected
   useEffect(() => {
     if (!selectedConversation) return;
 
@@ -60,10 +91,30 @@ const InboxPage = ({ userType }) => {
 
     fetchMessages();
 
-    // Optional: Poll every 5 seconds
-    const interval = setInterval(fetchMessages, 5000);
-    return () => clearInterval(interval);
-  }, [selectedConversation]);
+    // join socket room for this conversation
+    if (socket) {
+      socket.emit("join-conversation", selectedConversation._id);
+    }
+  }, [selectedConversation, socket]);
+
+  // listen for socket messages
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewMessage = (msg) => {
+      if (selectedConversation && msg.conversationId === selectedConversation._id) {
+        setMessages((prev) => [...prev, msg]);
+      }
+    };
+
+    socket.on("message", handleNewMessage);
+
+    return () => {
+      socket.off("message", handleNewMessage);
+    };
+  }, [socket, selectedConversation]);
+
+  // send message
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation) return;
 
@@ -81,9 +132,12 @@ const InboxPage = ({ userType }) => {
       );
 
       if (data.success) {
-        // Add new message to state
         setMessages((prev) => [...prev, data.message]);
         setNewMessage("");
+
+        if (socket) {
+          socket.emit("message", data.message);
+        }
       }
     } catch (error) {
       console.error("Failed to send message:", error);
@@ -100,7 +154,6 @@ const InboxPage = ({ userType }) => {
       </div>
     );
   }
-
   return (
     <div className="h-[95dvh] rounded-3xl overflow-hidden bg-accent flex">
       {/* Left Sidebar - Conversations List */}

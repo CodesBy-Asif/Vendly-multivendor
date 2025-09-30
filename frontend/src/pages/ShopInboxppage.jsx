@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { server } from "../Data";
 import { useSelector } from "react-redux";
+import { io } from "socket.io-client";
 
 const InboxPage = ({ userType }) => {
   const [conversations, setConversations] = useState([]);
@@ -13,18 +14,37 @@ const InboxPage = ({ userType }) => {
   const [newMessage, setNewMessage] = useState("");
   const [loadingMessages, setLoadingMessages] = useState(false);
 
+  // --- socket reference ---
+  const [socket, setSocket] = useState(null);
+
   useEffect(() => {
+    // connect socket when user or seller is logged in
+    if (!user && !seller) return;
+
+    const s = io("https://vendly-backend.vercel.app/", {
+      withCredentials: true,
+    });
+    setSocket(s);
+
+    // Cleanup
+    return () => {
+      s.disconnect();
+    };
+  }, [user, seller]);
+
+  useEffect(() => {
+  
     if (!user && !seller) return;
     const fetchConversations = async () => {
       try {
         const url =
           userType === "seller"
-            ? `${server}/conversation/get-all-conversation-seller/${user._id}`
-            : `${server}/conversation/get-all-conversation-user/${seller._id}`;
+            ? `${server}/conversation/get-all-conversation-seller/${seller._id}`
+            : `${server}/conversation/get-all-conversation-user/${user._id}`;
+
         const { data } = await axios.get(url, { withCredentials: true });
         if (data.success) {
           setConversations(data.conversations);
-          // Auto-select first conversation if available
           if (data.conversations.length > 0) {
             setSelectedConversation(data.conversations[0]);
           }
@@ -38,6 +58,7 @@ const InboxPage = ({ userType }) => {
 
     fetchConversations();
   }, [userType, user, seller]);
+
   useEffect(() => {
     if (!selectedConversation) return;
 
@@ -59,11 +80,24 @@ const InboxPage = ({ userType }) => {
     };
 
     fetchMessages();
-
-    // Optional: Poll every 5 seconds
-    const interval = setInterval(fetchMessages, 5000);
-    return () => clearInterval(interval);
   }, [selectedConversation]);
+
+  // --- Receive new messages from socket ---
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("message", (msg) => {
+      // only push messages that belong to current conversation
+      if (selectedConversation && msg.conversationId === selectedConversation._id) {
+        setMessages((prev) => [...prev, msg]);
+      }
+    });
+
+    return () => {
+      socket.off("message");
+    };
+  }, [socket, selectedConversation]);
+
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation) return;
 
@@ -81,25 +115,19 @@ const InboxPage = ({ userType }) => {
       );
 
       if (data.success) {
-        // Add new message to state
+        // Optimistic update
         setMessages((prev) => [...prev, data.message]);
         setNewMessage("");
+
+        // Emit socket event
+        if (socket) {
+          socket.emit("message", data.message);
+        }
       }
     } catch (error) {
       console.error("Failed to send message:", error);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading conversations...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="h-[95dvh] rounded-3xl overflow-hidden bg-accent flex">
