@@ -21,7 +21,7 @@ const InboxPage = ({ userType }) => {
   useEffect(() => {
     if (!user && !seller) return;
 
-    const s = io("https://vendly-multivendor.onrender.com/", {
+    const s = io("https://socket-dpdp.onrender.com/", {
       withCredentials: true,
       transports: ["websocket"],
     });

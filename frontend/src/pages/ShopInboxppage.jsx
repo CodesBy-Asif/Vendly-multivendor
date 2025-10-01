@@ -21,7 +21,7 @@ const InboxPage = ({ userType }) => {
     // connect socket when user or seller is logged in
     if (!user && !seller) return;
 
-    const s = io("https://vendly-multivendor.onrender.com/", {
+    const s = io("https://socket-dpdp.onrender.com/", {
       withCredentials: true,
     });
     setSocket(s);
