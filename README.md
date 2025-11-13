@@ -5,7 +5,7 @@
 * **Name:** Vendly Multi-Vendor E-commerce Platform
 * **One-liner:** A robust marketplace platform enabling multiple vendors to sell products while providing buyers with a seamless shopping experience across vendors.
 * **Repo:** [GitHub Repository URL](https://github.com/CodesBy-Asif/Vendly-multivendor)
-* **Demo:** [Live Demo](https://vendly-multivendor.vercel.app/)] (optional)
+* **Demo:** [Live Demo](https://vendly-multivendor.vercel.app/)
 
 ## Goals of the Project
 
