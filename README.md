@@ -4,8 +4,8 @@
 
 * **Name:** Vendly Multi-Vendor E-commerce Platform
 * **One-liner:** A robust marketplace platform enabling multiple vendors to sell products while providing buyers with a seamless shopping experience across vendors.
-* **Repo:** [Your GitHub Repository URL]
-* **Demo:** [Your Live Demo URL] (optional)
+* **Repo:** [GitHub Repository URL](https://github.com/CodesBy-Asif/Vendly-multivendor)
+* **Demo:** [Live Demo](https://vendly-multivendor.vercel.app/)] (optional)
 
 ## Goals of the Project
 
@@ -30,7 +30,7 @@
 | Authentication  | JWT                     | Stateless authentication with httpOnly cookies                        |
 | Payments        | Stripe                  | Secure payment processing with webhook support                        |
 | Email           | Nodemailer              | Transactional emails for orders, activation, notifications            |
-| Realtime        | Socket.io (implied)     | Real-time messaging between buyers and vendors                        |
+| Realtime        | Socket.io      | Real-time messaging between buyers and vendors                        |
 
 ### Architecture Diagram
 
@@ -198,13 +198,12 @@ erDiagram
     Shop ||--o{ Conversation : handles
     Shop ||--o{ Withdrawal : requests
     
-    Product ||--o{ OrderItem : contains
     Product ||--o{ Review : receives
     Product }o--|| Shop : belongs_to
     
     Event }o--|| Shop : belongs_to
     
-    Order ||--o{ OrderItem : contains
+    Order ||--o{ product : contains
     Order }o--|| User : placed_by
     Order }o--|| Shop : fulfilled_by
     Order ||--o| Refund : may_have
@@ -304,6 +303,25 @@ erDiagram
         string status
         date requestedAt
     }
+Review {
+        ObjectId user
+        number rating
+        number sold
+        string comment
+        date createdAt
+    }
+ Address {
+        string type
+        string label
+        string name
+        string phone
+        string address
+        string city
+        string state
+        string zipCode
+        string country
+        boolean isDefault
+    }
 ```
 
 ## Key User Flows
@@ -401,11 +419,8 @@ sequenceDiagram
 * **Role-based access control** with middleware checks on protected routes
 * **Input validation** on both client and server sides
 * **CORS configuration** for allowed origins only
-* **Rate limiting** on API endpoints to prevent abuse
 * **Cloudinary signed uploads** for secure image handling
 * **Environment variables** for sensitive credentials (never committed to repo)
-* **SQL injection prevention** through Mongoose parameterized queries
-* **XSS protection** by sanitizing user inputs
 
 ### Performance
 * **Redux state optimization** with proper action creators and reducers
@@ -453,12 +468,3 @@ sequenceDiagram
 * Multi-vendor order splitting adds complexity but is essential for marketplace functionality
 * Middleware architecture in Express.js enables clean separation of concerns
 
-### Next Steps
-* **Add WebSocket support** for real-time order updates and notifications
-* **Implement advanced analytics** for vendors (sales trends, popular products, revenue forecasting)
-* **Add payment method options** (PayPal, cryptocurrency)
-* **Enhance search functionality** with Elasticsearch or Algolia integration
-* **Build admin panel** with comprehensive platform management tools
-* **Implement automated testing** (Jest, React Testing Library, Supertest)
-* **Add internationalization** (i18n) for multi-language support
-* **Optimize for SEO** with
